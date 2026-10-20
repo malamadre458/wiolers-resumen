@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resumen de Discord</title>
+<link rel="stylesheet" href="/fuentes/fuentes.css">
+<link rel="stylesheet" href="/estilos.css">
+<style>
+  .page { max-width: 1040px; }
+  header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 22px; }
+  header .title { font-size: 34px; }
+  header .sp { flex: 1; }
+  header form { margin: 0; }
+  .stack { display: grid; gap: 18px; }
+  [hidden] { display: none !important; }
+
+  label.l { display: block; font-weight: 800; font-size: 13px; color: var(--mut); margin: 0 0 6px; }
+  select, input[type=datetime-local] {
+    width: 100%; min-width: 0; background: #fff; color: var(--ink); border: 2px solid var(--line); border-radius: 12px;
+    padding: 11px 12px; font: 700 15px 'Nunito', sans-serif;
+  }
+  select:focus, input[type=datetime-local]:focus { outline: none; border-color: var(--purple); box-shadow: 0 0 0 3px rgba(203,184,245,.5); }
+  .row { display: flex; gap: 10px; align-items: flex-end; }
+  .row > * { min-width: 0; }
+  .grow { flex: 1; }
+  .form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form .full { grid-column: 1 / -1; }
+  @media (max-width: 680px) { .form { grid-template-columns: 1fr; } header .title { font-size: 28px; } }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .chip { font: 700 13px 'Nunito', sans-serif; color: var(--outline); background: #fff; border: 2px solid var(--line); border-radius: 99px; padding: 5px 12px; cursor: pointer; }
+  .chip:hover { border-color: var(--purple); }
+  .check { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: var(--ink); cursor: pointer; }
+  .check input { width: 18px; height: 18px; accent-color: var(--outline); }
+  .go { width: 100%; font-size: 20px; padding: 15px; }
+  .note { font-size: 13px; font-weight: 700; color: var(--mut); line-height: 1.5; margin: 10px 0 0; }
+  .err { background: #fff0f6; border: 2px solid #ffc2df; color: #b0256a; border-radius: 14px; padding: 12px 14px; font-weight: 800; font-size: 14px; line-height: 1.5; }
+
+  /* Progreso */
+  .bar { height: 14px; border-radius: 99px; background: #efe8fd; overflow: hidden; margin: 12px 0 8px; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--grad); border-radius: 99px; transition: width .4s ease; }
+  .bar.busy i { width: 40% !important; animation: vaiven 1.4s ease-in-out infinite; }
+  @keyframes vaiven { 0% { transform: translateX(-100%); } 100% { transform: translateX(250%); } }
+  .prog-t { font: 600 18px 'Fredoka', sans-serif; color: var(--outline); }
+
+  /* Resultado */
+  .res-head { display: flex; gap: 10px; align-items: flex-start; flex-wrap: wrap; }
+  .res-head h2 { flex: 1; margin: 0; }
+  .res-sub { font-weight: 700; color: var(--mut); font-size: 14px; margin: 4px 0 14px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  @media (max-width: 680px) { .stats { grid-template-columns: 1fr 1fr; } }
+  .stat { background: #fff; border: 2px solid var(--line); border-radius: 16px; padding: 10px 12px; min-width: 0; }
+  .stat .n { font: 700 24px 'Fredoka', sans-serif; color: var(--outline); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .stat .k { font-size: 12px; font-weight: 800; color: var(--mut); }
+  .stat:nth-child(1) { border-color: #ffd0e8; } .stat:nth-child(4) { border-color: #cfe9fb; }
+  .two { display: grid; grid-template-columns: 1.6fr 1fr; gap: 18px; margin-top: 18px; align-items: start; }
+  @media (max-width: 860px) { .two { grid-template-columns: 1fr; } }
+  .two > * { min-width: 0; }
+  .summary { background: #fff; border-radius: 18px; padding: 6px 20px 16px; line-height: 1.6; font-size: 15.5px; font-weight: 600; }
+  .summary h2, .summary h3 { font: 600 19px/1.25 'Fredoka', sans-serif; color: var(--outline); margin: 18px 0 6px; }
+  .summary ul, .summary ol { margin: 4px 0 8px; padding-left: 22px; }
+  .summary li { margin: 3px 0; }
+  .summary p { margin: 6px 0; }
+  .summary strong { color: var(--ink); font-weight: 900; }
+  .side h3 { font: 600 17px 'Fredoka', sans-serif; color: var(--outline); margin: 0 0 8px; }
+  .people { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 6px; }
+  .people li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; font-weight: 800; font-size: 14px; }
+  .people .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .people .b { grid-column: 1 / -1; height: 7px; border-radius: 99px; background: var(--grad); }
+  .links { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 13px; font-weight: 700; }
+  .links a { color: #3f73c9; word-break: break-all; }
+  .links span { color: var(--mut); }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+  .actions .btn { flex: 1 1 180px; }
+  .warn { margin-top: 12px; }
+  .nosum { background: #fff; border-radius: 18px; padding: 16px 18px; font-weight: 700; line-height: 1.55; }
+  .nosum ol { margin: 8px 0 12px; padding-left: 20px; }
+  .meta { font-size: 12px; font-weight: 700; color: var(--mut); margin-top: 10px; }
+
+  /* Historial */
+  .hist { list-style: none; margin: 0; padding: 0; }
+  .hist li { display: flex; gap: 10px; align-items: center; padding: 10px 2px; border-top: 2px dashed var(--line); }
+  .hist li:first-child { border-top: 0; }
+  .hist button.open { flex: 1; min-width: 0; text-align: left; background: none; border: 0; padding: 0; cursor: pointer; color: var(--ink); font: 700 14px 'Nunito', sans-serif; }
+  .hist button.open b { font-family: 'Fredoka', sans-serif; font-weight: 600; color: var(--outline); font-size: 15px; }
+  .hist button.open small { display: block; color: var(--mut); }
+  .hist .x { flex: none; width: 32px; height: 32px; border-radius: 10px; border: 2px solid var(--line); background: #fff; color: var(--mut); cursor: pointer; font-size: 16px; }
+  .hist .x:hover { background: var(--pink-2); border-color: var(--pink-2); color: #fff; }
+
+  /* Ajustes */
+  dialog { border: 0; padding: 0; background: transparent; width: min(620px, calc(100% - 24px)); }
+  dialog::backdrop { background: rgba(59,42,122,.35); }
+  dialog .box { max-height: calc(100vh - 40px); overflow: auto; }
+  .set { padding: 14px 0; border-top: 2px dashed var(--line); }
+  .set:first-of-type { border-top: 0; }
+  .ok-line { font-weight: 800; color: #2c8a5b; }
+  .bad-line { font-weight: 800; color: #b0256a; }
+  .set .row { margin-top: 8px; }
+  .set input[type=password] { flex: 1; }
+  .help { font-size: 13px; line-height: 1.55; font-weight: 700; color: var(--mut); }
+  .help a { color: #e2569d; }
+  .toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); background: var(--ink); color: #fff; font-weight: 800; padding: 10px 18px; border-radius: 99px; z-index: 50; box-shadow: 0 8px 22px rgba(0,0,0,.2); }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <h1 class="title">Resumen <span class="p">de</span> <span class="s">Discord</span></h1>
+    <span class="sig">AXFL</span>
+    <span class="sp"></span>
+    <button class="btn" id="openSettings" type="button">⚙ Ajustes</button>
+    <form method="post" action="/salir" id="logout" hidden><button class="btn" type="submit">Salir</button></form>
+  </header>
+
+  <div class="stack">
+    <div class="err" id="globalErr" hidden></div>
+
+    <!-- Conectar el bot (solo si falta) -->
+    <section class="box" id="setupBox" hidden>
+      <h2>Conectar el bot</h2>
+      <p class="help" style="margin-top:0">Es el <b>mismo bot de la ruleta</b>. Pega aquí su token (lo tienes en el archivo <b>.env</b> o en las notas de cuando lo creaste).
+        <b>No pulses "Reset Token"</b> en Discord: si lo haces, la ruleta se desconecta y tendrías que pegar el token nuevo también allí.</p>
+      <div class="row">
+        <input type="password" id="setupToken" class="grow" placeholder="Token del bot" autocomplete="off">
+        <button class="btn primary" id="setupSave" type="button">Conectar</button>
+      </div>
+      <div class="note" id="setupMsg"></div>
+    </section>
+
+    <!-- Nuevo resumen -->
+    <section class="box" id="formBox">
+      <h2>Nuevo resumen</h2>
+      <div class="form">
+        <div class="full">
+          <label class="l" for="channel">Canal</label>
+          <div class="row">
+            <select id="channel" class="grow"><option>Cargando canales…</option></select>
+            <button class="btn" id="reloadCh" type="button" title="Volver a cargar los canales">↻</button>
+          </div>
+        </div>
+        <div>
+          <label class="l" for="from">Desde</label>
+          <input type="datetime-local" id="from">
+          <div class="chips">
+            <button class="chip" type="button" data-range="1">Últimas 24 h</button>
+            <button class="chip" type="button" data-range="3">3 días</button>
+            <button class="chip" type="button" data-range="7">1 semana</button>
+            <button class="chip" type="button" id="sinceLast" hidden>Desde el último resumen</button>
+          </div>
+        </div>
+        <div>
+          <label class="l" for="to">Hasta <span style="font-weight:700">(vacío = ahora)</span></label>
+          <input type="datetime-local" id="to">
+          <div class="chips"><button class="chip" type="button" id="toNow">Hasta ahora</button></div>
+        </div>
+        <div class="full">
+          <label class="check"><input type="checkbox" id="bots"> Incluir los mensajes de bots</label>
+        </div>
+        <div class="full">
+          <button class="btn primary go" id="go" type="button">Hacer resumen</button>
+          <p class="note" id="goNote"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Progreso -->
+    <section class="box" id="progBox" hidden>
+      <div class="prog-t" id="progT">Leyendo…</div>
+      <div class="bar" id="bar"><i id="barI"></i></div>
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <span class="note" id="progN" style="margin:0"></span>
+        <button class="btn" id="cancel" type="button">Cancelar</button>
+      </div>
+    </section>
+
+    <!-- Resultado -->
+    <section class="box" id="resBox" hidden>
+      <div class="res-head">
+        <h2 id="resTitle"></h2>
+      </div>
+      <div class="res-sub" id="resSub"></div>
+      <div class="stats" id="stats"></div>
+      <div class="warn" id="resWarn" hidden></div>
+      <div class="two">
+        <div>
+          <div class="summary" id="summary" hidden></div>
+          <div class="nosum" id="nosum" hidden></div>
+          <div class="meta" id="sumMeta"></div>
+        </div>
+        <aside class="side">
+          <h3>Quién habló más</h3>
+          <ul class="people" id="people"></ul>
+          <div id="linksWrap" hidden>
+            <h3>Enlaces compartidos</h3>
+            <ul class="links" id="links"></ul>
+          </div>
+        </aside>
+      </div>
+      <div class="actions">
+        <button class="btn" id="copySum" type="button">📋 Copiar resumen</button>
+        <button class="btn" id="copyClaude" type="button">💜 Copiar para Claude</button>
+        <a class="btn" id="dlTxt" href="#" download>⬇ Descargar conversación</a>
+      </div>
+    </section>
+
+    <!-- Historial -->
+    <section class="box" id="histBox" hidden>
+      <h2>Resúmenes anteriores</h2>
+      <ul class="hist" id="hist"></ul>
+    </section>
+
+    <p class="sig" style="text-align:center">hecho por AXFL</p>
+  </div>
+</div>
+
+<!-- Ajustes -->
+<dialog id="settings">
+  <div class="box">
+    <div class="row" style="align-items:center;margin-bottom:6px"><h2 class="grow" style="margin:0">Ajustes</h2><button class="btn" id="closeSettings" type="button">Cerrar</button></div>
+
+    <div class="set">
+      <label class="l">Bot de Discord</label>
+      <div id="botLine"></div>
+      <div class="row" id="tokenRow">
+        <input type="password" id="tokenIn" placeholder="Pegar otro token" autocomplete="off">
+        <button class="btn" id="tokenSave" type="button">Guardar</button>
+      </div>
+      <p class="help">Es el mismo bot de la ruleta: solo lee los mensajes, no escribe nada ni se conecta como la ruleta, así que las dos apps funcionan a la vez.
+        Si el resumen sale vacío, en <a href="https://discord.com/developers/applications" target="_blank" rel="noopener">Discord Developer Portal</a> → tu app → Bot, comprueba que está activado <b>Message Content Intent</b> (ya lo activasteis para la ruleta).</p>
+    </div>
+
+    <div class="set">
+      <label class="l">Clave de Claude (para el resumen automático)</label>
+      <div id="keyLine"></div>
+      <div class="row" id="keyRow">
+        <input type="password" id="keyIn" placeholder="sk-ant-…" autocomplete="off">
+        <button class="btn" id="keySave" type="button">Guardar</button>
+      </div>
+      <button class="btn" id="keyDel" type="button" style="margin-top:8px" hidden>Quitar la clave</button>
+      <p class="help">Opcional. Sin clave, la app te prepara la conversación y la pegas en Claude con "Copiar para Claude".
+        Para sacarla: <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a> → Billing (añade unos euros de crédito) → API Keys → Create Key. Cada resumen cuesta normalmente unos céntimos.</p>
+    </div>
+
+    <div class="set">
+      <label class="l" for="modelSel">Modelo de Claude</label>
+      <select id="modelSel"></select>
+      <p class="help" id="modelNote"></p>
+    </div>
+    <div class="note" id="setMsg"></div>
+  </div>
+</dialog>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let state = null, current = null, polling = null, channelsLoaded = false;
+
+// ---------- Utilidades ----------
+async function api(path, opts = {}) {
+  const r = await fetch(path, { ...opts, headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) } });
+  if (r.status === 401) { location.href = '/entrar?next=' + encodeURIComponent(location.pathname); throw new Error('sesión caducada'); }
+  return r.json();
+}
+const post = (path, body) => api(path, { method: 'POST', body: JSON.stringify(body || {}) });
+function toast(t) { const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.append(d); setTimeout(() => d.remove(), 2400); }
+async function copy(text) {
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch { const ta = document.createElement('textarea'); ta.value = text; document.body.append(ta); ta.select(); const ok = document.execCommand('copy'); ta.remove(); return ok; }
+}
+const pad = (n) => String(n).padStart(2, '0');
+const toLocalInput = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const money = (v) => (v < 0.01 ? 'menos de 1 céntimo' : v.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' $');
+const nf = (n) => Number(n || 0).toLocaleString('es-ES');
+function showErr(t) { const e = $('globalErr'); e.textContent = t || ''; e.hidden = !t; }
+
+// Markdown sencillo y seguro (títulos, listas, negrita, cursiva)
+function md(src) {
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const inline = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/(^|[\s(])\*(?!\s)(.+?)\*(?=[\s).,!?;:]|$)/g, '$1<em>$2</em>');
+  let html = '', list = null;
+  const close = () => { if (list) { html += `</${list}>`; list = null; } };
+  for (const raw of String(src).split('\n')) {
+    const line = raw.trimEnd();
+    let m;
+    if (!line.trim()) { close(); continue; }
+    if ((m = line.match(/^#{1,6}\s+(.*)$/))) { close(); html += `<h3>${inline(m[1])}</h3>`; continue; }
+    if ((m = line.match(/^\s*[-*•]\s+(.*)$/))) { if (list !== 'ul') { close(); html += '<ul>'; list = 'ul'; } html += `<li>${inline(m[1])}</li>`; continue; }
+    if ((m = line.match(/^\s*\d+[.)]\s+(.*)$/))) { if (list !== 'ol') { close(); html += '<ol>'; list = 'ol'; } html += `<li>${inline(m[1])}</li>`; continue; }
+    close(); html += `<p>${inline(line)}</p>`;
+  }
+  close();
+  return html;
+}
+
+// ---------- Estado y ajustes ----------
+async function loadState(reload) {
+  state = await api('/api/estado' + (reload ? '?recargar=1' : ''));
+  $('logout').hidden = !state.auth;
+  const botOk = state.bot && state.bot.ok;
+  $('setupBox').hidden = state.tokenSet && botOk;
+  if (state.tokenSet && !botOk) $('setupMsg').textContent = '⚠️ ' + (state.bot && state.bot.error || 'El bot no responde.');
+  $('goNote').textContent = state.keySet
+    ? 'Lee los mensajes y Claude escribe el resumen (suele tardar menos de un minuto).'
+    : 'Sin clave de Claude: lee los mensajes y te los prepara para pegarlos en Claude. Para que el resumen salga aquí solo, pon la clave en ⚙ Ajustes.';
+  $('go').textContent = state.keySet ? 'Hacer resumen' : 'Leer mensajes';
+  // Ajustes
+  $('botLine').innerHTML = '';
+  const bl = document.createElement('div');
+  bl.className = botOk ? 'ok-line' : 'bad-line';
+  bl.textContent = botOk ? `✓ Conectado como ${state.bot.name}` + (state.tokenFromEnv ? ' (token puesto en Railway)' : '') : '✗ ' + ((state.bot && state.bot.error) || 'Sin token');
+  $('botLine').append(bl);
+  $('tokenRow').hidden = state.tokenFromEnv;
+  $('keyLine').innerHTML = '';
+  const kl = document.createElement('div');
+  kl.className = state.keySet ? 'ok-line' : 'bad-line';
+  kl.textContent = state.keySet ? '✓ Clave guardada' + (state.keyFromEnv ? ' (puesta en Railway)' : '') : 'Sin clave (resumen manual con "Copiar para Claude")';
+  $('keyLine').append(kl);
+  $('keyRow').hidden = state.keyFromEnv;
+  $('keyDel').hidden = !state.keySet || state.keyFromEnv;
+  const sel = $('modelSel');
+  sel.replaceChildren(...state.models.map((m) => { const o = document.createElement('option'); o.value = m.id; o.textContent = m.name; return o; }));
+  sel.value = state.model; sel.disabled = state.modelFromEnv;
+  $('modelNote').textContent = state.modelFromEnv ? 'Elegido en Railway (RESUMEN_MODELO).' : 'Sonnet va muy bien para esto. Haiku es más barato; Opus, más fino y más caro.';
+  if (botOk && !channelsLoaded) loadChannels();
+  if (!botOk) $('channel').replaceChildren(new Option('Conecta el bot primero', ''));
+  if (state.job && (state.job.phase === 'leyendo' || state.job.phase === 'resumiendo')) startPolling();
+}
+
+async function loadChannels(reload) {
+  const sel = $('channel');
+  const prev = sel.value;
+  sel.replaceChildren(new Option('Cargando canales…', ''));
+  const r = await api('/api/canales' + (reload ? '?recargar=1' : ''));
+  sel.replaceChildren();
+  if (!r.ok) { sel.append(new Option('No se pueden cargar los canales', '')); showErr(r.error); return; }
+  if (!r.channels.length) { sel.append(new Option('El bot no ve ningún canal', '')); return; }
+  let group = null, last = null;
+  for (const c of r.channels) {
+    if (c.guild !== last) { group = document.createElement('optgroup'); group.label = c.guild; sel.append(group); last = c.guild; }
+    group.append(new Option('#' + c.name, c.id));
+  }
+  sel.value = (reload && prev) || r.defaultId || r.channels[0].id;
+  channelsLoaded = true;
+}
+
+// ---------- Fechas ----------
+function setRange(days) {
+  const d = new Date(Date.now() - days * 864e5);
+  $('from').value = toLocalInput(d); $('to').value = '';
+}
+document.querySelectorAll('[data-range]').forEach((b) => (b.onclick = () => setRange(+b.dataset.range)));
+$('toNow').onclick = () => { $('to').value = ''; };
+setRange(7);
+
+// ---------- Lanzar ----------
+$('go').onclick = async () => {
+  showErr('');
+  const channelId = $('channel').value;
+  const from = $('from').value ? new Date($('from').value).getTime() : NaN;
+  const to = $('to').value ? new Date($('to').value).getTime() : 0;
+  if (!channelId) return showErr('Elige un canal.');
+  if (!from) return showErr('Elige la fecha "desde".');
+  if (to && to <= from) return showErr('La fecha "desde" tiene que ser anterior a "hasta".');
+  $('go').disabled = true;
+  const r = await post('/api/leer', { channelId, from, to, includeBots: $('bots').checked }).catch((e) => ({ ok: false, error: e.message }));
+  $('go').disabled = false;
+  if (!r.ok) { showErr(r.error); if (r.job) startPolling(); return; }
+  autoSummarize = true;
+  startPolling();
+};
+let autoSummarize = false;
+
+function startPolling() {
+  clearInterval(polling);
+  $('progBox').hidden = false; $('go').disabled = true;
+  const tick = async () => {
+    const r = await api('/api/trabajo').catch(() => null);
+    if (!r || !r.job) return;
+    const j = r.job;
+    if (j.phase === 'leyendo') {
+      $('progT').textContent = 'Leyendo los mensajes de Discord…';
+      const span = (j.to - j.from) || 1, pct = Math.max(3, Math.min(100, ((j.to - j.oldest) / span) * 100));
+      $('bar').classList.remove('busy'); $('barI').style.width = pct + '%';
+      const day = j.oldest ? new Date(j.oldest).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }) : '';
+      $('progN').textContent = `${nf(j.count)} mensajes${day ? ' · vamos por el ' + day : ''}`;
+      $('cancel').hidden = false;
+    } else if (j.phase === 'resumiendo') {
+      $('progT').textContent = 'Claude está escribiendo el resumen…';
+      $('bar').classList.add('busy');
+      $('progN').textContent = 'Suele tardar menos de un minuto.';
+      $('cancel').hidden = true;
+    } else {
+      clearInterval(polling); polling = null;
+      $('progBox').hidden = true; $('go').disabled = false; $('bar').classList.remove('busy');
+      if (j.phase === 'error') { showErr(j.error); if (j.recordId) openRecord(j.recordId); return; }
+      await openRecord(j.recordId);
+      loadHistory();
+      if (j.phase === 'leido' && autoSummarize && current && state.keySet) {
+        autoSummarize = false;
+        if (!current.stats.messages) return;
+        if (current.estimate.cost <= 0.5) summarizeNow();
+      }
+      autoSummarize = false;
+    }
+  };
+  tick(); polling = setInterval(tick, 700);
+}
+$('cancel').onclick = () => post('/api/trabajo/cancelar');
+
+async function summarizeNow() {
+  showErr('');
+  const r = await post('/api/resumir', { id: current.id });
+  if (!r.ok) return showErr(r.error);
+  startPolling();
+}
+
+// ---------- Mostrar un resumen ----------
+async function openRecord(id, scroll = true) {
+  const r = await api('/api/resumenes/' + id);
+  if (!r.ok) return;
+  const it = current = r.item;
+  $('resBox').hidden = false;
+  $('resTitle').textContent = `#${it.channel}` + (it.guild ? ` · ${it.guild}` : '');
+  $('resSub').textContent = `Del ${it.fromTxt} al ${it.toTxt}`;
+  const s = it.stats;
+  const cards = [[nf(s.messages), 'mensajes'], [nf(s.people), 'personas'], [s.busiestDay ? s.busiestDay.k : '—', 'día con más charla'], [s.busiestHour ? s.busiestHour.k : '—', 'hora punta']];
+  $('stats').replaceChildren(...cards.map(([n, k]) => { const d = document.createElement('div'); d.className = 'stat'; d.innerHTML = '<div class="n"></div><div class="k"></div>'; d.firstChild.textContent = n; d.lastChild.textContent = k; return d; }));
+  const warns = [];
+  if (s.contentMissing) warns.push('⚠️ Casi todos los mensajes llegan vacíos: al bot le falta "Message Content Intent" (⚙ Ajustes explica dónde se activa).');
+  if (it.truncated) warns.push('⚠️ Había demasiados mensajes: solo se han leído los más recientes de ese periodo. Elige menos días para verlo entero.');
+  if (it.summary && it.summary.cut) warns.push('⚠️ El resumen se ha cortado por largo. Prueba con menos días.');
+  $('resWarn').hidden = !warns.length; $('resWarn').className = 'warn'; $('resWarn').textContent = warns.join(' ');
+  // Personas
+  const max = Math.max(1, ...s.topPeople.map((p) => p.v));
+  $('people').replaceChildren(...s.topPeople.map((p) => {
+    const li = document.createElement('li');
+    li.innerHTML = '<span class="nm"></span><span></span><span class="b"></span>';
+    li.children[0].textContent = p.k; li.children[1].textContent = nf(p.v);
+    li.children[2].style.width = Math.max(4, (p.v / max) * 100) + '%';
+    return li;
+  }));
+  if (!s.topPeople.length) $('people').innerHTML = '<li class="note">Nadie ha escrito en esas fechas.</li>';
+  // Enlaces
+  $('linksWrap').hidden = !s.links.length;
+  $('links').replaceChildren(...s.links.map((l) => {
+    const li = document.createElement('li'); const a = document.createElement('a');
+    a.href = /^https?:\/\//.test(l.url) ? l.url : '#'; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = l.url;
+    const sp = document.createElement('span'); sp.textContent = ' · ' + l.who;
+    li.append(a, sp); return li;
+  }));
+  // Resumen
+  if (it.summary) {
+    $('summary').innerHTML = md(it.summary.text); $('summary').hidden = false; $('nosum').hidden = true;
+    const mname = (state.models.find((m) => m.id === it.summary.model) || { name: it.summary.model }).name.replace(/\s*\(.*\)$/, '');
+    $('sumMeta').textContent = `Hecho con ${mname} · coste aproximado: ${money(it.summary.cost)}`;
+  } else {
+    $('summary').hidden = true; $('nosum').hidden = false; $('sumMeta').textContent = '';
+    const n = $('nosum'); n.replaceChildren();
+    if (!s.messages) { n.textContent = 'No hay mensajes en esas fechas.'; }
+    else {
+      const p = document.createElement('div');
+      p.innerHTML = '<b>Mensajes listos.</b> Para el resumen:<ol><li>Pulsa <b>💜 Copiar para Claude</b> (abajo).</li><li>Abre Claude, pega y envía. Si es muy larga, usa <b>⬇ Descargar conversación</b> y adjunta el archivo.</li></ol>';
+      n.append(p);
+      if (state.keySet) {
+        const b = document.createElement('button'); b.className = 'btn primary'; b.type = 'button';
+        b.textContent = `✨ Resumir aquí con Claude (aprox. ${money(it.estimate.cost)})`;
+        b.onclick = summarizeNow; n.append(b);
+      }
+    }
+  }
+  $('copySum').hidden = !it.summary;
+  $('dlTxt').href = `/api/resumenes/${it.id}/conversacion.txt`;
+  if (scroll) $('resBox').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+$('copySum').onclick = async () => {
+  if (!current || !current.summary) return;
+  const head = `Resumen de #${current.channel} (del ${current.fromTxt} al ${current.toTxt})\n\n`;
+  toast((await copy(head + current.summary.text)) ? 'Resumen copiado' : 'No se ha podido copiar');
+};
+$('copyClaude').onclick = async () => {
+  if (!current) return;
+  const t = await fetch(`/api/resumenes/${current.id}/para-claude.txt`).then((r) => r.text());
+  toast((await copy(t)) ? 'Copiado: pégalo en Claude' : 'No se ha podido copiar; usa Descargar');
+};
+
+// ---------- Historial ----------
+async function loadHistory() {
+  const r = await api('/api/resumenes');
+  const items = r.items || [];
+  $('histBox').hidden = !items.length;
+  const last = items[0];
+  $('sinceLast').hidden = !last;
+  $('hist').replaceChildren(...items.map((it) => {
+    const li = document.createElement('li');
+    const b = document.createElement('button'); b.className = 'open'; b.type = 'button';
+    b.innerHTML = '<b></b><small></small>';
+    b.firstChild.textContent = `#${it.channel} · ${nf(it.messages)} mensajes${it.hasSummary ? '' : ' (sin resumen)'}`;
+    b.lastChild.textContent = `Del ${it.fromTxt} al ${it.toTxt}`;
+    b.onclick = () => openRecord(it.id);
+    const x = document.createElement('button'); x.className = 'x'; x.type = 'button'; x.title = 'Borrar'; x.textContent = '×';
+    x.onclick = async () => { if (!confirm('¿Borrar este resumen?')) return; await api('/api/resumenes/' + it.id, { method: 'DELETE' }); if (current && current.id === it.id) { $('resBox').hidden = true; current = null; } loadHistory(); };
+    li.append(b, x); return li;
+  }));
+  $('sinceLast').onclick = async () => {
+    const full = await api('/api/resumenes/' + last.id);
+    if (full.ok) { $('from').value = toLocalInput(new Date(full.item.to)); $('to').value = ''; if (full.item.channelId) $('channel').value = full.item.channelId; }
+  };
+}
+
+// ---------- Ajustes ----------
+$('openSettings').onclick = () => { $('setMsg').textContent = ''; $('settings').showModal(); };
+$('closeSettings').onclick = () => $('settings').close();
+async function saveSettings(body, msgEl) {
+  msgEl.textContent = 'Comprobando…';
+  const r = await post('/api/ajustes', body).catch((e) => ({ ok: false, error: e.message }));
+  msgEl.textContent = r.ok ? '✓ ' + r.msg : '✗ ' + r.error;
+  if (r.ok) { channelsLoaded = false; await loadState(true); if (current) openRecord(current.id, false); } // que el resumen abierto vea la clave nueva
+  return r.ok;
+}
+$('setupSave').onclick = async () => { const v = $('setupToken').value.trim(); if (!v) return; if (await saveSettings({ discordToken: v }, $('setupMsg'))) $('setupToken').value = ''; };
+$('tokenSave').onclick = async () => { const v = $('tokenIn').value.trim(); if (!v) return; if (await saveSettings({ discordToken: v }, $('setMsg'))) $('tokenIn').value = ''; };
+$('keySave').onclick = async () => { const v = $('keyIn').value.trim(); if (!v) return; if (await saveSettings({ anthropicKey: v }, $('setMsg'))) $('keyIn').value = ''; };
+$('keyDel').onclick = () => { if (confirm('¿Quitar la clave de Claude?')) saveSettings({ quitarClave: true }, $('setMsg')); };
+$('modelSel').onchange = (e) => saveSettings({ model: e.target.value }, $('setMsg'));
+$('reloadCh').onclick = () => loadChannels(true);
+
+loadState().then(loadHistory).catch((e) => showErr('No se puede conectar con la app: ' + e.message));
+</script>
+</body>
+</html>

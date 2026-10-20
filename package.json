@@ -1,0 +1,16 @@
+{
+  "name": "wiolers-resumen",
+  "version": "1.0.0",
+  "description": "Resumen de Discord: lee un canal con el bot de la ruleta y resume lo que se ha hablado desde la fecha que elijas — AXFL",
+  "main": "server.js",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "AXFL",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": "22.x"
+  },
+  "dependencies": {}
+}
