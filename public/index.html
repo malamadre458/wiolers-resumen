@@ -4,111 +4,111 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Resumen de Discord</title>
-<link rel="stylesheet" href="/fuentes/fuentes.css">
 <link rel="stylesheet" href="/estilos.css">
 <style>
-  .page { max-width: 1040px; }
-  header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 22px; }
-  header .title { font-size: 34px; }
+  .page { max-width: 900px; margin: 0 auto; padding: 28px 16px 60px; }
+  header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 26px; }
+  .brand { display: flex; align-items: center; gap: 12px; margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -.02em; }
+  .brand svg { flex: none; }
+  .sig { color: var(--soft); font-size: 12px; font-weight: 600; letter-spacing: .04em; }
   header .sp { flex: 1; }
   header form { margin: 0; }
   .stack { display: grid; gap: 18px; }
-  [hidden] { display: none !important; }
 
-  label.l { display: block; font-weight: 800; font-size: 13px; color: var(--mut); margin: 0 0 6px; }
-  select, input[type=datetime-local] {
-    width: 100%; min-width: 0; background: #fff; color: var(--ink); border: 2px solid var(--line); border-radius: 12px;
-    padding: 11px 12px; font: 700 15px 'Nunito', sans-serif;
-  }
-  select:focus, input[type=datetime-local]:focus { outline: none; border-color: var(--purple); box-shadow: 0 0 0 3px rgba(203,184,245,.5); }
-  .row { display: flex; gap: 10px; align-items: flex-end; }
+  label.l { display: block; color: var(--soft); font-size: 13px; font-weight: 600; margin: 0 0 7px; }
+  .row { display: flex; gap: 10px; align-items: stretch; }
   .row > * { min-width: 0; }
   .grow { flex: 1; }
-  .form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 20px; }
   .form .full { grid-column: 1 / -1; }
-  @media (max-width: 680px) { .form { grid-template-columns: 1fr; } header .title { font-size: 28px; } }
-  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-  .chip { font: 700 13px 'Nunito', sans-serif; color: var(--outline); background: #fff; border: 2px solid var(--line); border-radius: 99px; padding: 5px 12px; cursor: pointer; }
-  .chip:hover { border-color: var(--purple); }
-  .check { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: var(--ink); cursor: pointer; }
-  .check input { width: 18px; height: 18px; accent-color: var(--outline); }
-  .go { width: 100%; font-size: 20px; padding: 15px; }
-  .note { font-size: 13px; font-weight: 700; color: var(--mut); line-height: 1.5; margin: 10px 0 0; }
-  .err { background: #fff0f6; border: 2px solid #ffc2df; color: #b0256a; border-radius: 14px; padding: 12px 14px; font-weight: 800; font-size: 14px; line-height: 1.5; }
+  @media (max-width: 680px) { .form { grid-template-columns: 1fr; } .brand { font-size: 22px; } }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 9px; }
+  .chip { background: #15161c; border: 1px solid var(--line); color: var(--text); font: 500 13px var(--font); padding: 5px 12px; border-radius: 99px; cursor: pointer; }
+  .chip:hover { border-color: var(--blurple); }
+  .check { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer; }
+  .check input { width: 17px; height: 17px; accent-color: var(--blurple); }
+  .go { width: 100%; padding: 14px; font-size: 16px; border-radius: 12px; }
 
   /* Progreso */
-  .bar { height: 14px; border-radius: 99px; background: #efe8fd; overflow: hidden; margin: 12px 0 8px; }
-  .bar i { display: block; height: 100%; width: 0; background: var(--grad); border-radius: 99px; transition: width .4s ease; }
-  .bar.busy i { width: 40% !important; animation: vaiven 1.4s ease-in-out infinite; }
-  @keyframes vaiven { 0% { transform: translateX(-100%); } 100% { transform: translateX(250%); } }
-  .prog-t { font: 600 18px 'Fredoka', sans-serif; color: var(--outline); }
+  .prog-t { font-weight: 650; }
+  .bar { height: 8px; margin: 14px 0 10px; border-radius: 99px; background: #1a1b22; overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0; border-radius: 99px; background: var(--blurple); transition: width .4s ease; }
+  .bar.busy i { width: 35% !important; animation: slide 1.4s ease-in-out infinite; }
+  @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(290%); } }
 
   /* Resultado */
-  .res-head { display: flex; gap: 10px; align-items: flex-start; flex-wrap: wrap; }
-  .res-head h2 { flex: 1; margin: 0; }
-  .res-sub { font-weight: 700; color: var(--mut); font-size: 14px; margin: 4px 0 14px; }
-  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .res-title { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -.01em; }
+  .res-sub { color: var(--soft); font-size: 14px; margin: 4px 0 18px; }
+  .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 12px; }
   @media (max-width: 680px) { .stats { grid-template-columns: 1fr 1fr; } }
-  .stat { background: #fff; border: 2px solid var(--line); border-radius: 16px; padding: 10px 12px; min-width: 0; }
-  .stat .n { font: 700 24px 'Fredoka', sans-serif; color: var(--outline); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .stat .k { font-size: 12px; font-weight: 800; color: var(--mut); }
-  .stat:nth-child(1) { border-color: #ffd0e8; } .stat:nth-child(4) { border-color: #cfe9fb; }
-  .two { display: grid; grid-template-columns: 1.6fr 1fr; gap: 18px; margin-top: 18px; align-items: start; }
-  @media (max-width: 860px) { .two { grid-template-columns: 1fr; } }
-  .two > * { min-width: 0; }
-  .summary { background: #fff; border-radius: 18px; padding: 6px 20px 16px; line-height: 1.6; font-size: 15.5px; font-weight: 600; }
-  .summary h2, .summary h3 { font: 600 19px/1.25 'Fredoka', sans-serif; color: var(--outline); margin: 18px 0 6px; }
-  .summary ul, .summary ol { margin: 4px 0 8px; padding-left: 22px; }
-  .summary li { margin: 3px 0; }
+  .stat { padding: 12px 14px; min-width: 0; border-left: 1px solid var(--line); }
+  .stat:first-child { border-left: 0; }
+  @media (max-width: 680px) { .stat:nth-child(3) { border-left: 0; } .stat:nth-child(n+3) { border-top: 1px solid var(--line); } }
+  .stat .n { font-size: 20px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .stat .k { color: var(--soft); font-size: 12.5px; }
+  .warn { margin-top: 14px; }
+  .two { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr); gap: 30px; margin-top: 24px; align-items: start; }
+  @media (max-width: 820px) { .two { grid-template-columns: 1fr; } }
+  .summary { max-width: 68ch; font-size: 16px; line-height: 1.65; color: #dcdce3; }
+  .summary h2, .summary h3 { font-size: 16px; font-weight: 700; color: var(--text); margin: 22px 0 6px; }
+  .summary h3:first-child { margin-top: 0; }
+  .summary ul, .summary ol { margin: 4px 0 10px; padding-left: 20px; }
+  .summary li { margin: 4px 0; }
+  .summary li::marker { color: var(--blurple-2); }
   .summary p { margin: 6px 0; }
-  .summary strong { color: var(--ink); font-weight: 900; }
-  .side h3 { font: 600 17px 'Fredoka', sans-serif; color: var(--outline); margin: 0 0 8px; }
-  .people { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 6px; }
-  .people li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; font-weight: 800; font-size: 14px; }
-  .people .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .people .b { grid-column: 1 / -1; height: 7px; border-radius: 99px; background: var(--grad); }
-  .links { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 13px; font-weight: 700; }
-  .links a { color: #3f73c9; word-break: break-all; }
-  .links span { color: var(--mut); }
-  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+  .summary strong { color: #fff; }
+  .nosum { border: 1px dashed var(--line); border-radius: 12px; padding: 16px 18px; line-height: 1.6; }
+  .nosum ol { margin: 8px 0 14px; padding-left: 20px; }
+  .meta { color: var(--soft); font-size: 12.5px; margin-top: 16px; }
+  .side h3 { font-size: 14px; font-weight: 650; color: var(--soft); margin: 0 0 12px; }
+  .people { list-style: none; margin: 0 0 24px; padding: 0; display: grid; gap: 10px; font-size: 14px; }
+  .people li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; align-items: center; }
+  .people .nm { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .people li > span:nth-child(2) { color: var(--soft); font-variant-numeric: tabular-nums; }
+  .people .b { grid-column: 1 / -1; height: 6px; border-radius: 99px; background: var(--blurple); }
+  .links { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; font-size: 13px; }
+  .links a { word-break: break-all; }
+  .links span { color: var(--soft); }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--line); }
   .actions .btn { flex: 1 1 180px; }
-  .warn { margin-top: 12px; }
-  .nosum { background: #fff; border-radius: 18px; padding: 16px 18px; font-weight: 700; line-height: 1.55; }
-  .nosum ol { margin: 8px 0 12px; padding-left: 20px; }
-  .meta { font-size: 12px; font-weight: 700; color: var(--mut); margin-top: 10px; }
 
   /* Historial */
   .hist { list-style: none; margin: 0; padding: 0; }
-  .hist li { display: flex; gap: 10px; align-items: center; padding: 10px 2px; border-top: 2px dashed var(--line); }
-  .hist li:first-child { border-top: 0; }
-  .hist button.open { flex: 1; min-width: 0; text-align: left; background: none; border: 0; padding: 0; cursor: pointer; color: var(--ink); font: 700 14px 'Nunito', sans-serif; }
-  .hist button.open b { font-family: 'Fredoka', sans-serif; font-weight: 600; color: var(--outline); font-size: 15px; }
-  .hist button.open small { display: block; color: var(--mut); }
-  .hist .x { flex: none; width: 32px; height: 32px; border-radius: 10px; border: 2px solid var(--line); background: #fff; color: var(--mut); cursor: pointer; font-size: 16px; }
-  .hist .x:hover { background: var(--pink-2); border-color: var(--pink-2); color: #fff; }
+  .hist li { display: flex; gap: 10px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+  .hist li:first-child { border-top: 0; padding-top: 0; }
+  .hist button.open { flex: 1; min-width: 0; text-align: left; background: none; border: 0; padding: 2px 0; cursor: pointer; color: var(--text); font: 400 14px/1.45 var(--font); }
+  .hist button.open b { font-weight: 650; }
+  .hist button.open:hover b { color: var(--blurple-2); }
+  .hist button.open small { display: block; color: var(--soft); font-size: 12.5px; }
+  .hist .x { flex: none; width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--line); background: none; color: var(--soft); cursor: pointer; font-size: 15px; }
+  .hist .x:hover { color: #fff; background: var(--bad); border-color: var(--bad); }
 
   /* Ajustes */
-  dialog { border: 0; padding: 0; background: transparent; width: min(620px, calc(100% - 24px)); }
-  dialog::backdrop { background: rgba(59,42,122,.35); }
+  dialog { border: 0; padding: 0; background: transparent; color: var(--text); width: min(620px, calc(100% - 24px)); }
+  dialog::backdrop { background: rgba(0,0,0,.75); }
   dialog .box { max-height: calc(100vh - 40px); overflow: auto; }
-  .set { padding: 14px 0; border-top: 2px dashed var(--line); }
+  .dlg-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .dlg-head h2 { margin: 0; font-size: 18px; }
+  .set { padding: 16px 0; border-top: 1px solid var(--line); }
   .set:first-of-type { border-top: 0; }
-  .ok-line { font-weight: 800; color: #2c8a5b; }
-  .bad-line { font-weight: 800; color: #b0256a; }
+  .ok-line { color: #6fd08f; font-weight: 600; }
+  .bad-line { color: var(--warn); font-weight: 600; }
   .set .row { margin-top: 8px; }
   .set input[type=password] { flex: 1; }
-  .help { font-size: 13px; line-height: 1.55; font-weight: 700; color: var(--mut); }
-  .help a { color: #e2569d; }
-  .toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); background: var(--ink); color: #fff; font-weight: 800; padding: 10px 18px; border-radius: 99px; z-index: 50; box-shadow: 0 8px 22px rgba(0,0,0,.2); }
+  .toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); background: #fff; color: #000; font-weight: 600; padding: 9px 18px; border-radius: 99px; z-index: 120; }
+  footer { color: #55576a; font-size: 12px; text-align: center; margin-top: 34px; }
 </style>
 </head>
 <body>
 <div class="page">
   <header>
-    <h1 class="title">Resumen <span class="p">de</span> <span class="s">Discord</span></h1>
+    <h1 class="brand">
+      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><rect width="30" height="30" rx="9" fill="#5865f2"/><path d="M8 10.5h14M8 15h14M8 19.5h8" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>
+      Resumen de Discord
+    </h1>
     <span class="sig">AXFL</span>
     <span class="sp"></span>
-    <button class="btn" id="openSettings" type="button">⚙ Ajustes</button>
+    <button class="btn" id="openSettings" type="button">Ajustes</button>
     <form method="post" action="/salir" id="logout" hidden><button class="btn" type="submit">Salir</button></form>
   </header>
 
@@ -118,8 +118,8 @@
     <!-- Conectar el bot (solo si falta) -->
     <section class="box" id="setupBox" hidden>
       <h2>Conectar el bot</h2>
-      <p class="help" style="margin-top:0">Es el <b>mismo bot de la ruleta</b>. Pega aquí su token (lo tienes en el archivo <b>.env</b> o en las notas de cuando lo creaste).
-        <b>No pulses "Reset Token"</b> en Discord: si lo haces, la ruleta se desconecta y tendrías que pegar el token nuevo también allí.</p>
+      <p class="help" style="margin-top:0">Es el mismo bot de la ruleta. Pega aquí su token.
+        No pulses "Reset Token" en Discord: si lo haces, la ruleta se desconecta y tendrías que pegar el token nuevo también allí.</p>
       <div class="row">
         <input type="password" id="setupToken" class="grow" placeholder="Token del bot" autocomplete="off">
         <button class="btn primary" id="setupSave" type="button">Conectar</button>
@@ -135,7 +135,7 @@
           <label class="l" for="channel">Canal</label>
           <div class="row">
             <select id="channel" class="grow"><option>Cargando canales…</option></select>
-            <button class="btn" id="reloadCh" type="button" title="Volver a cargar los canales">↻</button>
+            <button class="btn" id="reloadCh" type="button" title="Volver a cargar los canales" aria-label="Volver a cargar los canales">↻</button>
           </div>
         </div>
         <div>
@@ -149,7 +149,7 @@
           </div>
         </div>
         <div>
-          <label class="l" for="to">Hasta <span style="font-weight:700">(vacío = ahora)</span></label>
+          <label class="l" for="to">Hasta (vacío = ahora)</label>
           <input type="datetime-local" id="to">
           <div class="chips"><button class="chip" type="button" id="toNow">Hasta ahora</button></div>
         </div>
@@ -175,9 +175,7 @@
 
     <!-- Resultado -->
     <section class="box" id="resBox" hidden>
-      <div class="res-head">
-        <h2 id="resTitle"></h2>
-      </div>
+      <p class="res-title" id="resTitle"></p>
       <div class="res-sub" id="resSub"></div>
       <div class="stats" id="stats"></div>
       <div class="warn" id="resWarn" hidden></div>
@@ -197,9 +195,9 @@
         </aside>
       </div>
       <div class="actions">
-        <button class="btn" id="copySum" type="button">📋 Copiar resumen</button>
-        <button class="btn" id="copyClaude" type="button">💜 Copiar para Claude</button>
-        <a class="btn" id="dlTxt" href="#" download>⬇ Descargar conversación</a>
+        <button class="btn" id="copySum" type="button">Copiar resumen</button>
+        <button class="btn" id="copyClaude" type="button">Copiar para Claude</button>
+        <a class="btn" id="dlTxt" href="#" download>Descargar conversación</a>
       </div>
     </section>
 
@@ -208,15 +206,14 @@
       <h2>Resúmenes anteriores</h2>
       <ul class="hist" id="hist"></ul>
     </section>
-
-    <p class="sig" style="text-align:center">hecho por AXFL</p>
   </div>
+  <footer>hecho por AXFL</footer>
 </div>
 
 <!-- Ajustes -->
 <dialog id="settings">
   <div class="box">
-    <div class="row" style="align-items:center;margin-bottom:6px"><h2 class="grow" style="margin:0">Ajustes</h2><button class="btn" id="closeSettings" type="button">Cerrar</button></div>
+    <div class="dlg-head"><h2>Ajustes</h2><button class="btn" id="closeSettings" type="button">Cerrar</button></div>
 
     <div class="set">
       <label class="l">Bot de Discord</label>
@@ -226,7 +223,7 @@
         <button class="btn" id="tokenSave" type="button">Guardar</button>
       </div>
       <p class="help">Es el mismo bot de la ruleta: solo lee los mensajes, no escribe nada ni se conecta como la ruleta, así que las dos apps funcionan a la vez.
-        Si el resumen sale vacío, en <a href="https://discord.com/developers/applications" target="_blank" rel="noopener">Discord Developer Portal</a> → tu app → Bot, comprueba que está activado <b>Message Content Intent</b> (ya lo activasteis para la ruleta).</p>
+        Si el resumen sale vacío, en <a href="https://discord.com/developers/applications" target="_blank" rel="noopener">Discord Developer Portal</a> → tu app → Bot, comprueba que está activado "Message Content Intent".</p>
     </div>
 
     <div class="set">

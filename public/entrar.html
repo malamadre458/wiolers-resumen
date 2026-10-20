@@ -4,39 +4,42 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Entrar · Resumen de Discord</title>
-<link rel="stylesheet" href="/fuentes/fuentes.css">
 <link rel="stylesheet" href="/estilos.css">
 <style>
-  .wrap { min-height: 100vh; display: grid; place-items: center; padding: 16px; position: relative; z-index: 1; }
-  .card { width: min(420px, 100%); text-align: center; border-width: 4px; border-color: var(--outline);
-          box-shadow: 0 0 0 4px #fff, 0 0 40px rgba(255,170,220,.6), 0 0 80px rgba(170,140,240,.35); }
-  .title { font-size: 34px; margin-bottom: 4px; }
-  form { display: grid; gap: 12px; margin-top: 22px; text-align: left; }
-  label { font-weight: 800; font-size: 13px; color: var(--mut); }
-  .err { color: #d6337a; font-weight: 800; font-size: 14px; min-height: 18px; }
-  .heart { color: var(--pink-2); }
+  .wrap { min-height: 100vh; display: grid; place-items: center; padding: 16px; }
+  .card { width: min(400px, 100%); padding: 30px 26px; text-align: center; }
+  .card svg { margin-bottom: 14px; }
+  h1 { margin: 0 0 4px; font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
+  .sub { color: var(--soft); font-size: 14px; margin: 0 0 22px; }
+  form { display: grid; gap: 12px; text-align: left; }
+  label { color: var(--soft); font-size: 13px; font-weight: 600; }
+  .err:empty { display: none; }
+  .btn { width: 100%; padding: 12px; }
+  .sig { color: #55576a; font-size: 12px; margin-top: 18px; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="box card">
-    <h1 class="title">Resumen <span class="p">de</span> <span class="s">Discord</span></h1>
-    <div class="sig">AXFL</div>
+  <main class="box card">
+    <svg width="44" height="44" viewBox="0 0 30 30" aria-hidden="true"><rect width="30" height="30" rx="9" fill="#5865f2"/><path d="M8 10.5h14M8 15h14M8 19.5h8" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>
+    <h1>Resumen de Discord</h1>
+    <p class="sub">Escribe la contraseña para entrar.</p>
     <form method="post" action="/entrar">
       <input type="hidden" name="next" id="next">
       <label for="pw">Contraseña</label>
       <input type="password" id="pw" name="password" autocomplete="current-password" autofocus required>
       <div class="err" id="err"></div>
-      <button class="btn primary" type="submit">Entrar <span class="heart">♥</span></button>
+      <button class="btn primary" type="submit">Entrar</button>
     </form>
-  </div>
+    <div class="sig">AXFL</div>
+  </main>
 </div>
 <script>
   const q = new URLSearchParams(location.search);
   document.getElementById('next').value = q.get('next') || '/';
   const e = q.get('error');
   if (e === 'espera') document.getElementById('err').textContent = 'Demasiados intentos. Espera unos minutos y vuelve a probar.';
-  else if (e) document.getElementById('err').textContent = 'Contraseña incorrecta.';
+  else if (e) document.getElementById('err').textContent = 'La contraseña no es correcta.';
 </script>
 </body>
 </html>

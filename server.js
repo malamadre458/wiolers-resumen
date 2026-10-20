@@ -211,11 +211,6 @@ async function handle(req, res) {
 
   // Archivos públicos
   if (M === 'GET' && p === '/estilos.css') return sendFile(res, PUB('estilos.css'));
-  if (M === 'GET' && p.startsWith('/fuentes/')) {
-    const f = p.slice(9);
-    if (!['fuentes.css', 'Fredoka.woff', 'Nunito.woff'].includes(f)) return send(res, 404, 'No encontrado');
-    return sendFile(res, PUB('fuentes/' + f), { 'Cache-Control': 'public, max-age=604800' });
-  }
   if (M === 'GET' && p === '/favicon.ico') return send(res, 204, '');
 
   // Entrar / salir
